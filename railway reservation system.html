@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Railway Reservation (Mini)</title>
+  <style>
+    body{font-family:Arial, sans-serif;background:#f7f7f7;display:flex;justify-content:center;align-items:center;min-height:100vh}
+    form, .ticket{background:#fff;padding:16px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.1);width:320px}
+    h2{margin:0 0 12px}
+    label{display:block;margin:8px 0 4px}
+    input,select{width:100%;padding:8px;border:1px solid #ddd;border-radius:6px}
+    button{margin-top:12px;width:100%;padding:10px;border:0;border-radius:6px;background:#0d6efd;color:#fff;cursor:pointer}
+    .row{display:flex;gap:8px}
+    .row > div{flex:1}
+    .ticket{display:none;margin-top:12px}
+    small{color:#666}
+  </style>
+</head>
+<body>
+  <main>
+    <form id="form">
+      <h2>Railway Reservation</h2>
+      <label>Passenger Name</label>
+      <input id="name" placeholder="Full name" required>
+
+      <div class="row">
+        <div>
+          <label>Age</label>
+          <input id="age" type="number" min="1" max="120" required>
+        </div>
+        <div>
+          <label>Gender</label>
+          <select id="gender">
+            <option>Male</option><option>Female</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>From</label>
+          <input id="from" placeholder="Source" required>
+        </div>
+        <div>
+          <label>To</label>
+          <input id="to" placeholder="Destination" required>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Date</label>
+          <input id="date" type="date" required>
+        </div>
+        <div>
+          <label>Class</label>
+          <select id="cls">
+            <option value="GEN">General</option>
+            <option value="SL">Sleeper</option>
+            <option value="3A">3A</option>
+            <option value="2A">2A</option>
+            <option value="1A">1A</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Seats</label>
+          <input id="seats" type="number" min="1" max="6" value="1" required>
+        </div>
+        <div>
+          <label>Train No.</label>
+          <input id="train" placeholder="e.g. 12627" required>
+        </div>
+      </div>
+
+      <small>Note: Demo only (no real booking).</small>
+      <button type="submit">Book</button>
+    </form>
+
+    <section id="ticket" class="ticket"></section>
+  </main>
+
+  <script>
+    const fares = { GEN: 120, SL: 180, "3A": 550, "2A": 900, "1A": 1500 }; // per seat (demo)
+    const form = document.getElementById('form');
+    const out = document.getElementById('ticket');
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const name = v('name'), age = +v('age'), gender = v('gender');
+      const from = v('from'), to = v('to'), date = v('date'), cls = v('cls');
+      const seats = Math.max(1, Math.min(6, +v('seats')||1));
+      const train = v('train');
+
+      if(!name || !from || !to || !date || !train || age<1){ alert('Please fill all fields.'); return; }
+
+      const amount = seats * (fares[cls] || fares.GEN);
+      const pnr = genPNR();
+      out.style.display = 'block';
+      out.innerHTML = `
+        <h3>e-Ticket (Demo)</h3>
+        <p><b>PNR:</b> ${pnr}</p>
+        <p><b>Name:</b> ${name} (${gender}, ${age})</p>
+        <p><b>Train:</b> ${train} | <b>Date:</b> ${date}</p>
+        <p><b>From:</b> ${from} → <b>To:</b> ${to}</p>
+        <p><b>Class:</b> ${cls} | <b>Seats:</b> ${seats}</p>
+        <p><b>Total Fare:</b> ₹${amount}</p>
+        <button onclick="window.print()">Print Ticket</button>
+      `;
+      form.reset();
+    });
+
+    function v(id){ return document.getElementById(id).value.trim(); }
+    function genPNR(){ return (Date.now().toString().slice(-8) + Math.floor(Math.random()*90+10)).replace(/(\d{3})(?=\d)/g,'$1-'); }
+  </script>
+</body>
+</html>
